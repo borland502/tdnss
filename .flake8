@@ -1,0 +1,5 @@
+[flake8]
+max-line-length = 88
+extend-ignore = E203, E266
+# E203: black's equal space around slice operators
+# E266: too many leading '#' for block comment
