@@ -45,7 +45,7 @@ def init_config(server_url: str, api_token: str = "") -> ConfigResponse:
             A non-expiring API token. The token's validity is not checked before saving.
 
     Returns:
-        ConfigResponse: With a status and a message.
+        ConfigResponse: With status and message.
     """
 
     try:
@@ -95,7 +95,7 @@ def read_config() -> ConfigResponse:
     """Read the config file.
 
     Returns:
-        ConfigResponse: With a status, message and data.
+        ConfigResponse: With status, message and data.
 
         status:
             Can be INIT_ERROR, which indicates an error that can probably be
@@ -146,7 +146,7 @@ def modify_config(
             before saving.
 
     Returns:
-        ConnectionResponse: With a status and a message.
+        ConnectionResponse: With status and message.
     """
 
     if not CONFIG_FILE_PATH.exists():

@@ -20,12 +20,23 @@ class BaseResponse:
         - and any data returned by the API call, if applicable.
 
     When returning a Response, the docstring should indicate which fields are being
-    used, and if any conditions apply. For example:
+    used, and if any conditions apply. If no additional conditions are given for an
+    included field, a default behaviour is implied.
+
+    For example:
 
         Returns:
-            BaseResponse: with a status, message and data.
+            BaseResponse: with status, message and data.
 
-            data: The server information, if successful.
+            message:
+                If an error occurred.
+            data:
+                The server information, if successful.
+
+    We see that status does not have a description, so we assume it can only be one of
+    the three base statuses. However a message is returned only if an error occurred,
+    so this behaviour is documented. Same goes for data, which is only returned is the
+    request was successful, i.e. status == OK.
     """
 
     status: int
