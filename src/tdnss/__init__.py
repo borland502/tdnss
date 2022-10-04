@@ -10,4 +10,4 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 # Define the status codes. Includes the three possible codes returned by the API and
 # any custom code used to convey additional context.
-(OK, ERROR, INVALID_TOKEN, INIT_ERROR) = range(3)
+(OK, ERROR, INVALID_TOKEN, INIT_ERROR) = range(4)
