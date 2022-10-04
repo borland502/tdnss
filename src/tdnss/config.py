@@ -34,7 +34,7 @@ class ConfigResponse(BaseResponse):
 
 
 def init_config(server_url: str, api_token: str = "") -> ConfigResponse:
-    """Initialize the configuration file.
+    """Initializes the configuration file.
 
     Args:
         server_url:
@@ -92,7 +92,7 @@ def init_config(server_url: str, api_token: str = "") -> ConfigResponse:
 
 
 def read_config() -> ConfigResponse:
-    """Read the config file.
+    """Reads the config file.
 
     Returns:
         ConfigResponse: With status, message and data.
@@ -136,7 +136,7 @@ def modify_config(
     server_url: str = "",
     api_token: str = "",
 ) -> ConfigResponse:
-    """Update the config file.
+    """Updates the config file.
 
     Args:
         server_url:
