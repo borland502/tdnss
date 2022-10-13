@@ -606,3 +606,126 @@ class Connection:
         else:
             log.debug(self._get_error_message(r))
             return ConnectionResponse(ERROR, "Could not check for updates")
+
+    ################################ Dashboard methods ################################
+
+    def get_stats(
+        self, timeframe: str, start: str = "", end: str = ""
+    ) -> ConnectionResponse:
+        """Gets the stats that are displayed on the web dashboard.
+
+        Args:
+            timeframe:
+                The timeframe of the logs to retrieve. Can be "lastHour", "lastDay",
+                "lastWeek", "lastMonth", "lastYear" or "custom".
+            start:
+                The start date in UTC. Defaults to "". Only if the timeframe is
+                "custom".
+            end:
+                The end date in UTC. Defaults to "". Only if the timeframe is "custom".
+
+        Returns:
+            ConnectionResponse: with status, message and data.
+
+            data:
+                Only if OK.
+
+        Note:
+            This function is untested.
+        """
+        # TODO: test this function
+
+        params = {"type": timeframe}
+
+        if timeframe == "custom":
+            if not start or not end:
+                return ConnectionResponse(
+                    ERROR, "Provide a start and end dates when using a custom timeframe"
+                )
+            else:
+                params["start"] = start
+                params["end"] = end
+        elif timeframe not in [
+            "lastHour",
+            "lastDay",
+            "lastWeek",
+            "lastMonth",
+            "lastYear",
+        ]:
+            return ConnectionError(ERROR, f"Invalid timeframe {timeframe}")
+
+        r = self._get("dashboard/stats/get", params)
+
+        if self._is_ok(r):
+            data = r.json().get("response")
+            return ConnectionResponse(OK, "Received stats from the server", data=data)
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, "Could not get stats from the server")
+
+    def get_top_stats(
+        self, stats_type: str, timeframe: str = "lastHour", limit: int = 1000
+    ) -> ConnectionResponse:
+        """Gets the top stats.
+
+        Args:
+            stats_type:
+                The type of stats. Can be "TopClients", "TopDomains" or
+                "TopBlockedDomains".
+            timeframe:
+                The timeframe of the logs to retrieve. Can be "lastHour", "lastDay",
+                "lastWeek", "lastMonth" or "lastYear".
+            limit:
+                The maximum number of records to retrieve. Defaults to 1000.
+
+        Returns:
+            ConnectionResponse: with status, message and data.
+
+            data:
+                Only if OK.
+
+        Note:
+            This function is untested.
+        """
+        # TODO: test this function
+
+        if timeframe not in [
+            "lastHour",
+            "lastDay",
+            "lastWeek",
+            "lastMonth",
+            "lastYear",
+        ]:
+            return ConnectionResponse(ERROR, f"Invalid timeframe {timeframe}")
+
+        if stats_type not in ["TopClients", "TopDomains", "TopBlockedDomains"]:
+            return ConnectionResponse(ERROR, f"Invalid stats_type {stats_type}")
+
+        if limit < 1:
+            return ConnectionResponse(ERROR, "Limit must be positive")
+
+        params = {"type": timeframe, "statsType": stats_type, "limit": limit}
+
+        r = self._get("dashboard/stats/getTop", params)
+
+        if self._is_ok(r):
+            data = r.json().get("response")
+            return ConnectionResponse(OK, "Received top stats", data=data)
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionError(ERROR, "Could not get top stats from the server")
+
+    def delete_stats(self) -> ConnectionError:
+        """Delete all stats from disk and from memory.
+
+        Returns:
+            ConnectionError: with status and message.
+        """
+
+        r = self._get("dashboard/stats/deleteAll")
+
+        if self._is_ok(r):
+            return ConnectionResponse(OK, "Deleted all stats")
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, "Could not delete stats")
