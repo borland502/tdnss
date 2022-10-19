@@ -729,3 +729,365 @@ class Connection:
         else:
             log.debug(self._get_error_message(r))
             return ConnectionResponse(ERROR, "Could not delete stats")
+
+    ########################### Authoritative zone methods ###########################
+
+    def list_zones(self) -> ConnectionResponse:
+        """List all authoritative zones hosted on the server
+
+        Returns:
+            ConnectionResponse: with status, message and data.
+
+            message:
+                If an error occurred.
+            data:
+                If OK, the list of all zones as returned by the server, i.e. a list of
+                dicts, see https://github.com/TechnitiumSoftware/DnsServer/blob/master/APIDOCS.md#authoritative-zone-api-calls  # noqa
+        """
+
+        r = self._get("zones/list")
+
+        if self._is_ok(r):
+            data = r.json().get("response")
+            zones = data.get("zones")
+            return ConnectionResponse(OK, zones)
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(
+                ERROR, "Could not get list of authoritative zones"
+            )
+
+    def create_zone(
+        self,
+        zone: str,
+        zone_type: str = "primary",
+        primary_ns: str = "",
+        sec_zone_transfer_protocol: str = "tcp",
+        sec_zone_tsig_key_name: str = "",
+        fwd_zone_forwarder_protocol: str = "Udp",
+        fwd_zone_forwarder: str = "",
+        fwd_zone_dnssec_validation: bool = False,
+    ) -> ConnectionResponse:
+        """Create a new primary, secondary, stub or conditionnal forwarder zone
+
+        Args:
+            zone:
+                The domain name of the zone to add. Can be a valid domain name, an IP
+                address or a network address in CIDR notation. Providing an IP or
+                network address creates a reverse zone.
+            zone_type:
+                The type of zone to create. Can be primary, secondary, stub or
+                forwarder.
+            sec_zone_primary_ns:
+                List of comma separated IP addresses of the primary
+                name server, used by Secondary or Stub zones. Can be omitted,
+                in which case the primary name server is resolved recursively.
+            sec_zone_transfer_protocol:
+                The zone transfer protocol used by secondary zones. Can be tcp or tls.
+                Defaults to tcp.
+            sec_zone_tsig_key_name:
+                Name of the TSIG key used by secondary zones.
+            fwd_zone_forwarder_protocol:
+                The DNS transport protocol used by a Conditional Forwarder zone. Can be
+                Udp, Tcp, Tls or Https. Defaults to Udp.
+            fwd_zone_forwarder:
+                Address of the DNS server used as a forwarder by a Forwarder zone.
+                Defaults to `this-server`, which allows you to override the zone with
+                records. If a record is not overriden it is then resolved via the
+                server as all other queries.
+            fwd_zone_dnssec_validation:
+                Whether to enable DNSSEC validation for a Forwarder zone. Defaults to
+                False.
+
+        Returns:
+            ConnectionResponse: with status, message.
+
+        Notes:
+            - Currently options related to a proxy are missing.
+            - Options related to secondary zones are untested.
+        """
+        # TODO: add proxy options
+
+        params = {"zone": zone, "type": zone_type}
+
+        if zone_type == "primary":
+            # just need to send the zone and type
+            pass
+
+        elif zone_type == "secondary":
+            if primary_ns:
+                params["primaryNameServerAddresses"] = primary_ns
+            if sec_zone_tsig_key_name:
+                params["tsigKeyName"] = sec_zone_tsig_key_name
+            # has a default
+            params["zoneTransferProtocol"] = sec_zone_transfer_protocol
+
+        elif zone_type == "forwarder":
+            if fwd_zone_forwarder:
+                params["forwarder"] = fwd_zone_forwarder
+            else:
+                return ConnectionResponse(
+                    ERROR,
+                    "Must use a forwarder when creating a Conditional Forwarder zone",
+                )
+            params["protocol"] = fwd_zone_forwarder_protocol
+            params["dnssecValidation"] = fwd_zone_dnssec_validation
+
+        elif zone_type == "stub":
+            if primary_ns:
+                params["primaryNameServerAddresses"] = primary_ns
+
+        else:
+            return ConnectionResponse(
+                ERROR, "Zone type must be either primary, secondary, forwarder or stub"
+            )
+
+        r = self._get("zones/create", params=params)
+
+        if self._is_ok(r):
+            # getting domain from the response may be inefficient compared to just
+            # using the given zone but since the server returns it we use it
+            return ConnectionResponse(
+                OK, f"Created {zone_type} zone {r.json().get('response').get('domain')}"
+            )
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, f"Failed to create zone {zone}")
+
+    def enable_zone(self, zone: str) -> ConnectionResponse:
+        """Enable an authoritative zone.
+
+        Args:
+            zone: Zone to enable.
+
+        Returns:
+            ConnectionResponse: with status and message.
+        """
+
+        params = {"zone": zone}
+        r = self._get("zones/enable", params=params)
+
+        if self._is_ok(r):
+            return ConnectionResponse(OK, f"Enabled zone {zone}")
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, f"Could not enable zone {zone}")
+
+    def disable_zone(self, zone: str) -> ConnectionResponse:
+        """Disable an authoritative zone.
+
+        Args:
+            zone: Zone to disable.
+
+        Returns:
+            ConnectionResponse: with status and message.
+        """
+
+        params = {"zone": zone}
+        r = self._get("zones/disable", params=params)
+
+        if self._is_ok(r):
+            return ConnectionResponse(OK, f"Disabled zone {zone}")
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, f"Could not disable zone {zone}")
+
+    def delete_zone(self, zone: str):
+        """Delete an authoritative zone
+
+        Args:
+            zone (str): The zone to delete
+        """
+
+        return self._delete_zone("zones/delete", zone)
+
+    def resync_zone(self, zone: str) -> ConnectionResponse:
+        """Resyncs a secondary or stub zone.
+
+        Args:
+            zone: The zone to resync.
+
+        Returns:
+            ConnectionResponse: with status and message.
+
+        Note:
+            This function is untested.
+        """
+        # TODO: test this function
+
+        params = {"zone": zone}
+        r = self._get("zones/resync", params=params)
+
+        if self._is_ok(r):
+            return ConnectionResponse(OK, f"Resynced zone {zone}")
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, f"Could not resync zone {zone}")
+
+    def get_zone_options(
+        self, zone: str, include_tsig_names: bool = False
+    ) -> ConnectionResponse:
+        """Gets the options of a specific zone.
+
+        Args:
+            zone:
+                The zone from which to read the options.
+            include_tsig_names:
+                Whether to include a list of the names of the available TSIG keys.
+                Defaults to False.
+
+        Returns:
+            ConnectionResponse: with status, message and data.
+
+            data:
+                Only if OK.
+        """
+
+        params = {"zone": zone, "includeAvailableTsigKeyNames": include_tsig_names}
+        r = self._get("zones/options/get", params=params)
+
+        if self._is_ok(r):
+            data = r.json().get("response")
+            return ConnectionResponse(OK, f"Options from {zone}", data=data)
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, f"Could not options for zone {zone}")
+
+    def set_zone_options(self) -> ConnectionResponse:
+        raise NotImplementedError
+
+    def get_zone_permissions(
+        self, zone: str, include_users_and_groups: bool = False
+    ) -> ConnectionResponse:
+        """Gets the permissions for a specific zone.
+
+        Args:
+            zone:
+                The zone from which to read the options.
+            include_users_and_groups:
+                Whether to include a list of the users and groups. Defaults to False.
+
+        Returns:
+            ConnectionResponse: with status, message and data.
+
+            data:
+                Only if OK.
+        """
+
+        params = {"zone": zone, "includeUsersAndGroups": include_users_and_groups}
+        r = self._get("zones/permissions/get", params=params)
+
+        if self._is_ok(r):
+            data = r.json().get("response")
+            return ConnectionResponse(OK, f"Permissions for {zone}", data=data)
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, f"Could not permissions for zone {zone}")
+
+    def set_zone_permissions(self) -> ConnectionResponse:
+        raise NotImplementedError
+
+    def sign_zone(
+        self,
+        zone: str,
+        algorithm: str = "ECDSA",
+        rsa_hash: str = "SHA256",
+        rsa_key_signing_key_size: int = 2048,
+        rsa_zone_signing_key_size: int = 1024,
+        ecdsa_curve: str = "P256",
+        ttl: int = 3600,
+        rsa_zone_signing_key_rollover: int = 90,
+        nx_proof: str = "NSEC",
+        nsec3_iterations: int = 0,
+        nsec3_salt_length: int = 0,
+    ) -> ConnectionResponse:
+        """Signs a primary zone with DNSSEC.
+
+        Args:
+            zone:
+                The primary zone to sign.
+            algorithm:
+                The algorithm to use. Can be ECDSA or RSA. Defaults to ECDSA.
+            rsa_hash:
+                The hash algorithm to use when using RSA. Can be MD5, SHA1, SHA256 or
+                SHA512. Defaults to SHA256.
+            rsa_key_signing_key_size:
+                The size of the Key Signing Key. Required when using RSA, must be a
+                positive value. Defaults to 2048.
+            rsa_zone_signing_key_size:
+                The size of the Zone Signing Key. Required when using RSA, must be a
+                positive value. Defaults to 1024.
+            ecdsa_curve:
+                The name of the curve to use with ECDSA. Can be P256 or P384. Defaults
+                to P256.
+            ttl:
+                The Time to Live for DNSKEY records. Defaults to 3600.
+            rsa_zone_signing_key_rollover:
+                The frequency in days at which the DNS server must rollover the Zone
+                Signing Keys. Ranges from 0 to 365, 0 disables rollover. Defaults to 0.
+            nx_proof:
+                The type of proof of non-existence. Can be NSEC or NSEC3. Defaults to
+                NSEC.
+            nsec3_iterations:
+                The number of iterations for hashing when using NSEC3. Defaults to 0.
+            nsec3_salt_length:
+                The length in bytes of the salt used with NSEC3. Defaults to 0.
+
+        Note:
+            The defaults are the same as those on the web console.
+        """
+
+        params = {
+            "zone": zone,
+            "algorithm": algorithm,
+            "dnsKeyTtl": ttl,
+            "nxProof": nx_proof,
+        }
+
+        # TODO: add validation of parameters?
+
+        if algorithm == "ECDSA":
+            params["curve"] = ecdsa_curve
+        elif algorithm == "RSA":
+            params["hash"] = rsa_hash
+            params["kskKeySize"] = rsa_key_signing_key_size
+            params["zskKeySize"] = rsa_zone_signing_key_size
+            params["zskRolloverDays"] = rsa_zone_signing_key_rollover
+        else:
+            return ConnectionResponse(ERROR, "Algorithm must be either ECDSA or RSA")
+
+        if nx_proof == "NSEC3":
+            params["iterations"] = nsec3_iterations
+            params["saltLength"] = nsec3_salt_length
+
+        r = self._get("zones/dnssec/sign", params=params)
+
+        if self._is_ok(r):
+            return ConnectionResponse(OK, f"Signed zone {zone}")
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, f"Could not sign zone {zone}")
+
+    def unsign_zone(self, zone: str) -> ConnectionResponse:
+        """Unsign a primary zone.
+
+        Args:
+            zone (str): The zone to unsign.
+
+        Returns:
+            ConnectionResponse: with status and message.
+
+        Note:
+            The web console displays some warnings when trying to unsign a zone while
+            this wrapper does not.
+        """
+
+        params = {"zone": zone}
+
+        r = self._get("zones/dnssec/unsign", params)
+
+        if self._is_ok(r):
+            return ConnectionResponse(OK, f"Unsigned zone {zone}")
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, f"Could not unsign zone {zone}")
