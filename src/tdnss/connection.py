@@ -1,3 +1,6 @@
+# Copyright: (c) 2022, JulioLoayzaM
+# GPL-3.0-only (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 import logging
 import requests
 
