@@ -1,6 +1,14 @@
 # tdnss
 
-A Python API wrapper for [Technitium DNS Server](https://github.com/TechnitiumSoftware/DnsServer)'s HTTP API.
+A Python API wrapper for
+[Technitium DNS Server](https://github.com/TechnitiumSoftware/DnsServer)'s
+HTTP API.
+
+## Notice
+This project is currently a work in progress: only the basic methods of the 
+[API](https://github.com/TechnitiumSoftware/DnsServer/blob/master/APIDOCS.md)
+are implemented (login, logout, etc.). They are working, if you want to test
+them.
 
 ## Why?
 
@@ -46,4 +54,5 @@ See [COPYING](./COPYING) to see the full text.
 
 ## Versioning
 
-This project follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
+This project follows
+[Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
