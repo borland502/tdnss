@@ -5,7 +5,7 @@ import logging
 import requests
 
 from dataclasses import dataclass
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 from tdnss import config
 from tdnss import OK, ERROR, INVALID_TOKEN, INIT_ERROR
@@ -953,8 +953,84 @@ class Connection:
             log.debug(self._get_error_message(r))
             return ConnectionResponse(ERROR, f"Could not options for zone {zone}")
 
-    def set_zone_options(self) -> ConnectionResponse:
-        raise NotImplementedError
+    def set_zone_options(
+        self,
+        zone: str,
+        disable: bool = False,
+        zone_transfer: str = "AllowOnlyZoneNameServers",
+        zone_transfer_nameservers: str = "",
+        zone_transfer_tsig_key_names: List[str] = [],
+        notify: str = "ZoneNameServers",
+        notify_nameservers: List[str] = [],
+    ) -> ConnectionResponse:
+        """Sets the options of a specific zone.
+
+        Args:
+            zone:
+                The zone to modify.
+            disable:
+                Whether to disable the zone. Defaults to False.
+            zone_transfer:
+                Whether to allow zone transfers. Can be Deny, AllowOnlyZoneNameServers,
+                AllowOnlySpecifiedNameServers or AllowBothZoneAndSpecifiedNameServer.
+                Defaults to "AllowOnlyZoneNameServers".
+            zone_transfer_nameservers:
+                A list of the transfer name servers' IP address. This option is used
+                when zone_transfer is either AllowOnlySpecifiedNameServers or
+                AllowBothZoneAndSpecifiedNameServers.
+            zone_transfer_tsig_key_names:
+                A list of the names of the TSIG keys that can be used to perform a zone
+                transfer. If the list only contains the string "clear", all key names
+                are cleared from the server.
+            notify:
+                Whether the DNS server should notify other DNS servers of zone updates.
+                Can be None, ZoneNameServers, SpecifiedNameServers or
+                BothZoneAndSpecifiedNameServers.
+            notify_nameservers:
+                A list of IP addresses of the servers to notify. Used only when notify
+                is SpecifiedNameServers or BothZoneAndSpecifiedNameServers.
+
+        Returns:
+            ConnectionResponse: _description_
+
+        Note:
+            Currently the update options are missing.
+        """
+        # TODO: test this
+
+        params = {"zone": zone, "disabled": disable, "zoneTransfer": zone_transfer}
+
+        if zone_transfer in [
+            "AllowOnlySpecifiedNameServers",
+            "AllowBothZoneAndSpecifiedNameServers",
+        ]:
+            if not zone_transfer_nameservers:
+                return ConnectionResponse(ERROR, "Missing name servers")
+            params["zoneTransferNameServers"] = zone_transfer_nameservers
+            if zone_transfer_tsig_key_names:
+                if (
+                    len(zone_transfer_tsig_key_names) == 1
+                    and zone_transfer_tsig_key_names[0] == "clear"
+                ):
+                    params["zoneTransferTsigKeyNames"] = False
+                else:
+                    params["zoneTransferTsigKeyNames"] = ",".join(
+                        zone_transfer_tsig_key_names
+                    )
+
+        if notify in ["SpecifiedNameServers", "BothZoneAndSpecifiedNameServers"]:
+            if not notify_nameservers:
+                return ConnectionResponse(ERROR, "Missing name servers to notify")
+            params["notify"] = notify
+            params["notifyNameServers"] = notify_nameservers
+
+        r = self._get("zones/options/set")
+
+        if self._is_ok(r):
+            return ConnectionResponse(OK, "Updated zone options")
+        else:
+            log.debug(self._get_error_message(r))
+            return ConnectionResponse(ERROR, "Could not update zone options")
 
     def get_zone_permissions(
         self, zone: str, include_users_and_groups: bool = False
