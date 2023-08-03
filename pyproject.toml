@@ -4,9 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tdnss"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
   { name="Julio Loayza Meneses", email="julio+tdnss@loayzameneses.com" },
+  { name="Chris Edstrom", email="cedstrom+tdnss@outlook.com" },
 ]
 description = "A Python wrapper of Technitium DNS server's API"
 readme = "README.md"
