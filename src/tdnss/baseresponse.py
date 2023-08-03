@@ -6,7 +6,6 @@ from typing import Any
 
 from tdnss import OK
 
-
 @dataclass
 class BaseResponse:
     """The base class for responses.

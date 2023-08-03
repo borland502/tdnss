@@ -11,7 +11,6 @@ from tdnss import config
 from tdnss import OK, ERROR, INVALID_TOKEN, INIT_ERROR
 from tdnss.baseresponse import BaseResponse
 
-
 log = logging.getLogger(__name__)
 
 
@@ -33,7 +32,7 @@ class Connection:
     """
 
     def __init__(
-        self, server_url: str = "", api_token: str = "", auto_login: bool = False
+            self, server_url: str = "http://127.0.0.1:5380", api_token: str = "", auto_login: bool = False
     ):
         """A connection to the DNS server API.
 
@@ -189,7 +188,7 @@ class Connection:
         self.params["token"] = token
 
     def _get(
-        self, path: str, params: Dict[str, str] = dict(), stream=False
+            self, path: str, params: Dict[str, str] = {}, stream=False
     ) -> requests.Response:
         """Perform the GET request.
 
@@ -272,86 +271,7 @@ class Connection:
             log.debug(f"{error} when calling read_config")
             return ConnectionResponse(response.status, response.message)
 
-    def _list_zones(self, path: str, domain: str, direction: str) -> ConnectionResponse:
-        """General method to list zones.
-
-        Args:
-            path:
-                The API path to use.
-            domain:
-                The domain name to list records of.
-            direction:
-                The direction on which to browse the zone, can be 'up' or 'down'.
-
-        Returns:
-            ConnectionResponse: With status, message and data.
-
-            message:
-                If an error occurred.
-            data:
-                If successful, data is the tuple (zones, records).
-        """
-        if direction not in ["up", "down"]:
-            return ConnectionResponse(ERROR, f"Invalid direction {direction}")
-
-        params = {"domain": domain, "direction": direction}
-
-        r = self._get(path, params)
-
-        if self._is_ok(r):
-            resp = r.json().get("response")
-            records = resp.get("records")
-            zones = resp.get("zones")
-            return ConnectionResponse(OK, data=(zones, records))
-
-        else:
-            log.debug(f"{path=}, {domain=}, {direction=}")
-            log.debug(self._get_error_message(r))
-            return ConnectionResponse(ERROR, "Could not list zones")
-
-    def _delete_zone(self, path: str, domain: str) -> ConnectionResponse:
-        """General method to delete a zone.
-
-        Args:
-            path:
-                The API path to use.
-            domain:
-                The domain to delete.
-
-        Returns:
-            ConnectionResponse: With only status.
-        """
-        params = {"domain": domain}
-
-        r = self._get(path, params)
-
-        if self._is_ok(r):
-            return ConnectionResponse(OK)
-        else:
-            log.debug(self._get_error_message(r))
-            return ConnectionResponse(ERROR)
-
-    def _flush(self, path: str) -> ConnectionResponse:
-        """General method to flush a group of zones.
-
-        Args:
-            path: The API path to use.
-
-        Returns:
-            ConnectionResponse: With only status.
-        """
-
-        r = self._get(path)
-
-        if self._is_ok(r):
-            return ConnectionResponse(OK)
-        else:
-            log.debug(self._get_error_message(r))
-            return ConnectionResponse(ERROR)
-
-    ######################### User methods ##########################
-
-    def login(self, username: str, password: str) -> ConnectionResponse:
+    def login(self, username: str = "admin", password: str = "admin") -> ConnectionResponse:
         """Gets a new session token.
 
         Not to be confused with the new non-expiring API tokens, which can be generated
@@ -376,13 +296,14 @@ class Connection:
 
         if self._is_ok(r):
             self.session_token = r.json().get("token")
+            self._set_current_token(self.session_token)
             return ConnectionResponse(OK, "Logged in")
 
         log.debug(self._get_error_message(r))
         return ConnectionResponse(ERROR, "Can't log in")
 
     def create_api_token(
-        self, username: str, password: str, token_name: str, save: bool = True
+            self, username: str, password: str, token_name: str, save: bool = True
     ) -> ConnectionResponse:
         """Creates a non-expiring API token.
 
@@ -548,7 +469,7 @@ class Connection:
             return ConnectionResponse(ERROR, "Could not get the user's profile")
 
     def set_user_profile(
-        self, display_name: str = "", session_timeout: int = -1
+            self, display_name: str = "", session_timeout: int = -1
     ) -> ConnectionResponse:
         """Sets some user profile values.
 
@@ -606,3 +527,11 @@ class Connection:
         else:
             log.debug(self._get_error_message(r))
             return ConnectionResponse(ERROR, "Could not check for updates")
+
+    def zone_api(self):
+        from tdnss.zone_api import ZoneAPI
+        return ZoneAPI(self)
+
+    def settings_api(self):
+        from tdnss.settings_api import SettingsAPI
+        return SettingsAPI(self)
