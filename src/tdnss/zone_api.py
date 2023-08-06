@@ -109,7 +109,7 @@ class ZoneAPI:
         # option to `false` to clear all security policies and stop TSIG authentication.
         # This option is valid only for Primary zones.
         if update_tsig_key_name is not None:
-            params["updateSecurityPolicies"] = f'{update_tsig_key_name}|{zone}|any'
+            params["updateSecurityPolicies"] = f'{update_tsig_key_name}|*.{zone}|any'
 
         params = {k:v for (k,v) in params.items() if v is not None}
 
