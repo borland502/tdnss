@@ -190,7 +190,7 @@ class Connection:
         self.params["token"] = token
 
     def _get(
-        self, path: str, params: Dict[str, str] = {}, stream=False
+        self, path: str, params: Dict[str, str] = None, stream=False
     ) -> requests.Response:
         """Perform the GET request.
 
@@ -223,6 +223,9 @@ class Connection:
             If the Connection does not have an API token, then a token *must* be in the
             given params.
         """
+
+        # Handle default val for dict.  See https://codeberg.org/JulioLoayzaM/tdnss/pulls/1#issuecomment-1020343
+        params = params if params is not None else {}
 
         # Check if an API token is set or the user is using another token in params.
         if self.token is None and params.get("token", None) is None:
