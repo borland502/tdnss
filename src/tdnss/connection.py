@@ -32,7 +32,10 @@ class Connection:
     """
 
     def __init__(
-            self, server_url: str = "http://127.0.0.1:5380", api_token: str = "", auto_login: bool = False
+        self,
+        server_url: str = "http://127.0.0.1:5380",
+        api_token: str = "",
+        auto_login: bool = False,
     ):
         """A connection to the DNS server API.
 
@@ -126,7 +129,6 @@ class Connection:
             str: The error message received.
         """
         if self._get_status(response) == ERROR:
-
             try:
                 d = response.json()
             except requests.JSONDecodeError as error:
@@ -188,7 +190,7 @@ class Connection:
         self.params["token"] = token
 
     def _get(
-            self, path: str, params: Dict[str, str] = {}, stream=False
+        self, path: str, params: Dict[str, str] = {}, stream=False
     ) -> requests.Response:
         """Perform the GET request.
 
@@ -251,7 +253,6 @@ class Connection:
         response = config.read_config()
 
         if response.is_ok():
-
             data: Tuple[str, str] = response.data
             server_url, api_token = data
 
@@ -266,12 +267,13 @@ class Connection:
             log.debug("API token found")
 
         else:
-
             error = "INIT_ERROR" if response.status == INIT_ERROR else "ERROR"
             log.debug(f"{error} when calling read_config")
             return ConnectionResponse(response.status, response.message)
 
-    def login(self, username: str = "admin", password: str = "admin") -> ConnectionResponse:
+    def login(
+        self, username: str = "admin", password: str = "admin"
+    ) -> ConnectionResponse:
         """Gets a new session token.
 
         Not to be confused with the new non-expiring API tokens, which can be generated
@@ -303,7 +305,7 @@ class Connection:
         return ConnectionResponse(ERROR, "Can't log in")
 
     def create_api_token(
-            self, username: str, password: str, token_name: str, save: bool = True
+        self, username: str, password: str, token_name: str, save: bool = True
     ) -> ConnectionResponse:
         """Creates a non-expiring API token.
 
@@ -329,7 +331,6 @@ class Connection:
         r = self._get("user/createToken", params)
 
         if self._is_ok(r):
-
             token = r.json().get("token")
             self._set_current_token(token)
 
@@ -342,7 +343,6 @@ class Connection:
             return ConnectionResponse(OK, f"Created API token {token_name}")
 
         else:
-
             error = self._get_error_message(r)
             log.debug(f"Error creating new API token: {error}")
             return ConnectionResponse(
@@ -469,7 +469,7 @@ class Connection:
             return ConnectionResponse(ERROR, "Could not get the user's profile")
 
     def set_user_profile(
-            self, display_name: str = "", session_timeout: int = -1
+        self, display_name: str = "", session_timeout: int = -1
     ) -> ConnectionResponse:
         """Sets some user profile values.
 
@@ -530,8 +530,10 @@ class Connection:
 
     def zone_api(self):
         from tdnss.zone_api import ZoneAPI
+
         return ZoneAPI(self)
 
     def settings_api(self):
         from tdnss.settings_api import SettingsAPI
+
         return SettingsAPI(self)

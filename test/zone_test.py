@@ -21,7 +21,9 @@ class ZoneTests(unittest.TestCase):
         self.assertEqual(r.status, OK)
 
     def test_enable_allow_zone_updates(self):
-        zone_name = f'test-{"".join(random.sample(string.ascii_lowercase[:26], 16))}.com'
+        zone_name = (
+            f'test-{"".join(random.sample(string.ascii_lowercase[:26], 16))}.com'
+        )
 
         connection = Connection()
         r = connection.login()
@@ -33,10 +35,13 @@ class ZoneTests(unittest.TestCase):
         r = connection.settings_api().add_tsig_key(zone_name)
         self.assertEqual(r.status, OK)
 
-        r = connection.zone_api().set_zone_options(zone_name,
-                                                   update_policy=RFC2136Options.Allow,
-                                                   update_tsig_key_name=zone_name)
+        r = connection.zone_api().set_zone_options(
+            zone_name,
+            update_policy=RFC2136Options.Allow,
+            update_tsig_key_name=zone_name,
+        )
         self.assertEqual(r.status, OK)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

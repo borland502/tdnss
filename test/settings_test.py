@@ -31,12 +31,17 @@ class SettingsTests(unittest.TestCase):
 
         r = c.settings_api().add_tsig_key(zone_name)
         self.assertEqual(r.status, OK)
-        self.assertIsNotNone(filter(lambda key: key["keyName"] == zone_name, r.data["tsigKeys"]))
+        self.assertIsNotNone(
+            filter(lambda key: key["keyName"] == zone_name, r.data["tsigKeys"])
+        )
 
         r = c.settings_api().rm_tsig_key(zone_name)
         self.assertEqual(r.status, OK)
-        self.assertEqual(list(filter(lambda key: key["keyName"] == zone_name, r.data["tsigKeys"])), [])
+        self.assertEqual(
+            list(filter(lambda key: key["keyName"] == zone_name, r.data["tsigKeys"])),
+            [],
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -32,11 +32,23 @@ class ZoneAPI:
     def __init__(self, connection: Connection):
         self.connection = connection
 
-    def create_zone(self, zone, zone_type="Primary", primary_name_server_addresses=None, zone_transfer_protocol=None,
-                    tsig_key_name=None, protocol=None, forwarder=None, dnssec_validation=None, proxy_type=None,
-                    proxy_address=None, proxy_port=None, proxy_username=None, proxy_password=None):
-
-        base_url = 'zones/create'
+    def create_zone(
+        self,
+        zone,
+        zone_type="Primary",
+        primary_name_server_addresses=None,
+        zone_transfer_protocol=None,
+        tsig_key_name=None,
+        protocol=None,
+        forwarder=None,
+        dnssec_validation=None,
+        proxy_type=None,
+        proxy_address=None,
+        proxy_port=None,
+        proxy_username=None,
+        proxy_password=None,
+    ):
+        base_url = "zones/create"
         # Prepare the request parameters
         params = {
             "zone": zone,
@@ -68,9 +80,7 @@ class ZoneAPI:
 
     def delete_zone(self, zone: str):
         base_url = "zones/delete"
-        params = {
-            "zone": zone
-        }
+        params = {"zone": zone}
 
         r = self.connection._get(base_url, params)
 
@@ -82,11 +92,19 @@ class ZoneAPI:
             log.debug(self.connection._get_error_message(r))
             return ZoneResponse(ERROR, "Could not delete zone")
 
-    def set_zone_options(self, zone, disabled=None, zone_transfer=None, zone_transfer_name_servers=None,
-                         zone_transfer_tsig_key_names=None, notify=None, notify_name_servers=None,
-                         update_policy=RFC2136Options.Deny,
-                         update_ip_addresses=None, update_tsig_key_name=None):
-
+    def set_zone_options(
+        self,
+        zone,
+        disabled=None,
+        zone_transfer=None,
+        zone_transfer_name_servers=None,
+        zone_transfer_tsig_key_names=None,
+        notify=None,
+        notify_name_servers=None,
+        update_policy=RFC2136Options.Deny,
+        update_ip_addresses=None,
+        update_tsig_key_name=None,
+    ):
         # Construct the URL for the API endpoint
         endpoint_url = f"zones/options/set"
 
@@ -109,9 +127,9 @@ class ZoneAPI:
         # option to `false` to clear all security policies and stop TSIG authentication.
         # This option is valid only for Primary zones.
         if update_tsig_key_name is not None:
-            params["updateSecurityPolicies"] = f'{update_tsig_key_name}|*.{zone}|any'
+            params["updateSecurityPolicies"] = f"{update_tsig_key_name}|*.{zone}|any"
 
-        params = {k:v for (k,v) in params.items() if v is not None}
+        params = {k: v for (k, v) in params.items() if v is not None}
 
         r = self.connection._get(endpoint_url, params)
 
