@@ -26,11 +26,11 @@ the `question` label.
 
 ## What type of contributions are allowed?
 
-All contributions are welcome: share suggestions, feature ideas and bug
-reports by [opening an issue](https://codeberg.org/JulioLoayzaM/tdnss/issues).
+All contributions are welcome: share suggestions, feature ideas and bug reports
+by [opening an issue](https://codeberg.org/JulioLoayzaM/tdnss/issues).
 
-Code contributions are also welcome, fork the repo and
-[create a pull request](https://codeberg.org/JulioLoayzaM/tdnss/pulls).
+Code contributions are also welcome, fork the repo and [create a pull
+request](https://codeberg.org/JulioLoayzaM/tdnss/pulls).
 
 See below for more information.
 
@@ -39,16 +39,18 @@ See below for more information.
 You want to contribute but don't know where to start? You can check if there are
 issues with:
 
--  The [good first issue label](https://codeberg.org/JulioLoayzaM/tdnss/issues?q=&state=open&labels=73949)
-   for issues that usually require just a few lines of code and where steps
-   towards the solution may be provided.
--  The [help wanted label](https://codeberg.org/JulioLoayzaM/tdnss/issues?q=&state=open&labels=73944)
-   for issues that require more attention and/or time, but aren't necessarily
-   harder than first issues.
+-  The [good first issue
+label](https://codeberg.org/JulioLoayzaM/tdnss/issues?q=&state=open&labels=73949)
+for issues that usually require just a few lines of code and where steps towards
+the solution may be provided.
+-  The [help wanted
+label](https://codeberg.org/JulioLoayzaM/tdnss/issues?q=&state=open&labels=73944)
+for issues that require more attention and/or time, but aren't necessarily
+harder than first issues.
 
-Working on your first pull request? Check out
-[this guide](https://opensource.guide/how-to-contribute/).
-If you still have some doubts, feel free to ask for help. :)
+Working on your first pull request? Check out [this
+guide](https://opensource.guide/how-to-contribute/).  If you still have some
+doubts, feel free to ask for help. :)
 
 ## Code guidelines
 
@@ -57,27 +59,28 @@ Some things to consider before submitting code:
 1. Document and comment your code (examples below):
 
    -  In general, functions must be type-hinted and have a clear description in
-      its docstring. The docstrings are written
-      [Google style](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
-      See below for an example.
+   its docstring. The docstrings are written [Google
+   style](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
+   See below for an example.
    -  Don't hesitate to comment: if there are too many (unnecessary) comments,
-      they can be cleaned before merging.
-   -  Remember,
-      [explicit is better than implicit](https://www.python.org/dev/peps/pep-0020/#the-zen-of-python).
+   they can be cleaned before merging.
+   -  Remember, [explicit is better than
+   implicit](https://www.python.org/dev/peps/pep-0020/#the-zen-of-python).
    -  Use spaces.
 
 2. Test your changes if possible. If not, indicate it with a comment below the
-   docstring. For example: `# TODO: test this`.
-3. Begin your commit message with an action in the present tense:
-   add \| remove \| change \| fix \| deprecate.
+docstring. For example: `# TODO: test this`.
+3. Begin your commit message with an action in the present tense: add \| remove
+\| change \| fix \| deprecate.
 
 ### Docstring examples
 
 Most of the methods will return a `ConnectionResponse`, which inherits from
-`BaseResponse`. To see how to document this, refer to the
-[definition of BaseResponse](https://codeberg.org/JulioLoayzaM/tdnss/src/branch/main/src/tdnss/baseresponse.py).
+`BaseResponse`. To see how to document this, refer to the [definition of
+BaseResponse](https://codeberg.org/JulioLoayzaM/tdnss/src/branch/main/src/tdnss/baseresponse.py).
 
 A Google style docstring, at least in this repo, will look like this:
+
 ```python
 def _get(
    self, path: str, params: Dict[str, str] = dict(), stream=False
@@ -115,16 +118,16 @@ def _get(
    """
 ```
 
-This example is taken from the
-[Connection.\_get method](https://codeberg.org/JulioLoayzaM/tdnss/src/commit/d7f3209464a866647a9271f98ba2bf1d03212276/src/tdnss/connection.py#L188)
+This example is taken from the [Connection.\_get
+method](https://codeberg.org/JulioLoayzaM/tdnss/src/commit/d7f3209464a866647a9271f98ba2bf1d03212276/src/tdnss/connection.py#L188)
 
 We see that the function:
 
--  Is type-hinted, i.e. the type of the parameters and the return values
-   are indicated.
+-  Is type-hinted, i.e. the type of the parameters and the return values are
+indicated.
 -  Has a description of its behaviour.
--  Explains the different parameters, return values, and possible
-   exceptions, whenever it applies.
+-  Explains the different parameters, return values, and possible exceptions,
+whenever it applies.
 
 Type-hinting outside of docstrings is encouraged, especially for imported
 classes, since IDEs usually use the hints to show suggestions.
@@ -136,35 +139,34 @@ https://github.com/MarcDiethelm/contributing/blob/master/README.md:
 
 -  Create a personal fork of the project on Codeberg.
 -  Clone the fork on your local machine. Your remote repo on Codeberg is called
-   `origin`.
+`origin`.
 -  Add the original repository as a remote called `upstream`.
 -  If you created your fork a while ago be sure to **pull upstream changes**
-   into your local repository.
+into your local repository.
 -  Create a new branch to work on! Branch from `develop`, preferably with a
-   distinctive name such as `develop/translation`.
+distinctive name such as `develop/translation`.
 -  Implement/fix your feature, comment your code.
--  Follow the code style of the project: see the
-   [code guidelines](./CONTRIBUTING.md#code-guidelines).
+-  Follow the code style of the project: see the [code
+guidelines](./CONTRIBUTING.md#code-guidelines).
 -  Add or change the documentation as needed.
--  If you have many smaller commits, you can squash them with git's
-   [interactive rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase).
-   Create a new branch if necessary.
+-  If you have many smaller commits, you can squash them with git's [interactive
+rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase).
+Create a new branch if necessary.
 -  Push your branch to your fork on Codeberg, the remote `origin`.
 -  From your fork open a pull request in the `develop` branch.
 -  Wait for it.
 -  If a maintainer requests further changes just push them to your branch. The
-   PR will be updated automatically.
+PR will be updated automatically.
 -  Once the pull request is approved and merged you can pull the changes from
-   `upstream` to your local repo and delete your extra branch(es).
+`upstream` to your local repo and delete your extra branch(es).
 
 For more information on the related commands, you can check this gist:
 https://gist.github.com/adamloving/5690951.
 
 ## Code review process
 
-I will review all submitted code as soon as possible, which may be not that soon.
-
-All tags/releases are to be signed by me.
+I will review all submitted code as soon as possible, which may be not that
+soon.
 
 ## Reporting bugs
 
@@ -183,6 +185,5 @@ Create a pull request if you have found a fix!
 
 ## Suggesting a feature or enhancement
 
-Create an issue. Currently there's no template for this either.
-
-Create a pull request if you have already started implementing it!
+Create an issue. Currently there's no template for this either.  Create a pull
+request if you have already started implementing it!
