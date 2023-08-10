@@ -5,46 +5,45 @@ A Python API wrapper for
 HTTP API.
 
 ## Notice
-This project is currently a work in progress: only the basic methods of the 
+
+This project is a work in progress. A list of features will be added, for now
+some basic methods of 
 [API](https://github.com/TechnitiumSoftware/DnsServer/blob/master/APIDOCS.md)
-are implemented (login, logout, etc.). They are working, if you want to test
-them.
+such as login/logout are implemented, with work on the [zone
+API](src/tdnss/zone_api.py) and the [settings API](src/tdnss/settings_api.py) is
+ongoing.
+
+Any feedback is welcome!
 
 ## Why?
 
 TL;DR: the main reason I use this DNS server is its API, since it gives full
-control over the server without having to login to the web console.
-For a slightly more detailed answer, see
-[here](https://www.julioloayzam.com/blog/tdnss/).
+control over the server without having to login to the web console. The idea is
+that scripts/CLIs/other tools can be built upon a library that wraps the API.
 
 ## Installation
 
-There is a package on PyPI (`tdnss`) but as the version number indicates, this
-wrapper is still a work in progress.
+The `tdnss` package is [available on PyPI](https://pypi.org/project/tdnss/).
 
 For development, use the provided Pipfile:
+
 ```bash
 pipenv install --dev
 ```
-This installs the only dependency, `requests`.  The `--dev` flag installs some
-dev tools (`flake8`, `black`, `pytest`) and `tdnss` as an editable dependency in
-order to test it.
+This creates a [virtual
+environment](https://docs.python.org/3/library/venv.html), installs the
+dependencies to run the package, the development tools, and the package itself
+as an editable dependency in order to test the changes live.
 
-If you don't use Pipenv, there's also a provided `requirements.txt` to ensure
-`requests` is installed and a `requirements-dev.txt` that corresponds to the
-execution of `pipenv install --dev`.
+If you don't use Pipenv, there's a `requirements.txt` provided to install
+runtime dependencies and a `requirements-dev.txt` to install development tools
+and `tdnss` as an editable package.
 
 ## Contributing
 
-Currently a good part of all API calls is covered, but the code was written for
-the previous version of the API so I'm currently in the process of updating it.
-So testing is a good way to contribute.
-
-If you want to contribute code, please open an issue indicating which section
-you would like to work on so that I can check if there isn't already some code
-written for it.
-
-For more information, see [CONTRIBUTING](./CONTRIBUTING.md).
+Do you want to contribute to this project? Great! We welcome any contributions,
+from code to documentation through feedback. Read
+[CONTRIBUTING](./CONTRIBUTING.md) for more information.
 
 ## License
 
