@@ -3,7 +3,7 @@
 
 import logging
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # Create the logger with a Null handler, to leave the logging configuration to the user.
 logging.getLogger(__name__).addHandler(logging.NullHandler())
