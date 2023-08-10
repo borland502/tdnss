@@ -4,14 +4,22 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tdnss"
-version = "0.2.0"
+version = "0.2.1"
+
 authors = [
   { name="Julio Loayza Meneses", email="julio+tdnss@loayzameneses.com" },
   { name="Chris Edstrom", email="cedstrom+tdnss@outlook.com" },
 ]
+
 description = "A Python wrapper of Technitium DNS server's API"
 readme = "README.md"
+
 requires-python = ">=3.7"
+dependencies = [
+  "requests==2.31.0",
+  "strenum==0.4.15",
+]
+
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
