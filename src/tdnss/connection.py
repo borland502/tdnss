@@ -540,3 +540,8 @@ class Connection:
         from tdnss.settings_api import SettingsAPI
 
         return SettingsAPI(self)
+
+    def dashboard_api(self):
+        from tdnss.dashboard import DashboardAPI
+
+        return DashboardAPI(self)
